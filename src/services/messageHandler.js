@@ -1,51 +1,45 @@
 import whatsappService from './whatsappService.js';
 import appendToSheet from './googleSheetsService.js';
+import openAIService from './openAIService.js';
 
 class MessageHandler {
   constructor() {
     this.appointmentState = {};
+    this.assistantState = {};
   }
 
   async handleIncomingMessage(message, senderInfo) {
-    try {
-      console.log('Incoming message:', message);
-      console.log('Sender info:', senderInfo);
+    if (message?.type === 'text') {
+      const incomingMessage = message.text.body.toLowerCase().trim();
 
-      const from = message.from; // Número del remitente
-
-      // Verificar si el usuario está en el flujo de agendamiento
-      if (this.appointmentState[from]) {
-        const incomingMessage = message?.text?.body?.trim();
-        await this.handleAppointmentFlow(from, incomingMessage);
-        return; // Detener aquí, no procesar más
+      if(this.isGreeting(incomingMessage)){
+        await this.sendWelcomeMessage(message.from, message.id, senderInfo);
+        await this.sendWelcomeMenu(message.from);
+      } 
+      
+      else if(incomingMessage === 'media') {
+        await this.sendMedia(message.from);
+      } 
+      
+      else if (this.appointmentState[message.from]) {
+        await this.handleAppointmentFlow(message.from, incomingMessage);
+      } 
+      
+      else if (this.assistantState[message.from]) {
+        await this.handleAssistantFlow(message.from, incomingMessage);
+      }     
+      
+      
+      else {
+        await this.handleMenuOption(message.from, incomingMessage);
       }
-
-      if (message?.type === 'text') {
-        const incomingMessage = message.text.body.toLowerCase().trim();
-        console.log('Incoming message text:', incomingMessage);
-
-        if (this.isGreeting(incomingMessage)) {
-          console.log('Greeting detected');
-          await this.sendWelcomeMessage(from, message.id, senderInfo);
-          await this.sendWelcomeMenu(from);
-        } else if (incomingMessage === 'media') {
-          console.log('Media request detected');
-          await this.sendMedia(from);
-        } else {
-          console.log('Echo response');
-          const response = `Echo: ${message.text.body}`;
-          await whatsappService.sendMessage(from, response, message.id);
-        }
-
-        await whatsappService.markAsRead(message.id);
-      } else if (message?.type === 'interactive') {
-        const option = message?.interactive?.button_reply?.title.toLowerCase().trim();
-        console.log('Interactive option:', option);
-        await this.handleMenuOption(from, option);
-        await whatsappService.markAsRead(message.id);
-      }
-    } catch (error) {
-      console.error('Error handling incoming message:', error);
+      await whatsappService.markAsRead(message.id);
+    } 
+    
+      else if (message?.type === 'interactive') {
+      const option = message?.interactive?.button_reply?.title.toLowerCase().trim();
+      await this.handleMenuOption(message.from, option);
+      await whatsappService.markAsRead(message.id);
     }
   }
 
@@ -94,7 +88,8 @@ class MessageHandler {
         break;
 
       case 'consultar':
-        response = 'Consulta tu cita';
+        this.assistantState[to] = { step: 'question' }; // Iniciar flujo de asistente
+        response = 'Por favor realiza tu consulta';
         break;
 
       case 'ubicación':
@@ -132,14 +127,14 @@ class MessageHandler {
     appendToSheet(userData);
 
     return `Gracias por agendar tu cita. 
-  *Resumen de tu Cita:*
-  
-  *Nombre:* ${appointment.name}
-  *Nombre de la Mascota:* ${appointment.petName}
-  *Tipo de Mascota:* ${appointment.petType}
-  *Razón de Consulta:* ${appointment.reason}
-  
-  Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
+*Resumen de tu Cita:*
+
+*Nombre:* ${appointment.name}
+*Nombre de la Mascota:* ${appointment.petName}
+*Tipo de Mascota:* ${appointment.petType}
+*Razón de Consulta:* ${appointment.reason}
+
+Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
   }
 
   async handleAppointmentFlow(to, message) {
@@ -175,6 +170,28 @@ class MessageHandler {
         response = 'Lo siento, no entendí tu mensaje. Por favor, responde a la pregunta anterior.';
     }
     await whatsappService.sendMessage(to, response);
+  }
+
+  async handleAssistantFlow(to, message) {
+    const state = this.assistantState[to];
+    let response;
+
+    const menuMessage = "¿La respuesta fue de tu ayuda?"
+    const buttons = [
+      {type: 'reply', reply: {id: 'option_4', title: "Si, gracias"} }, 
+      {type: 'reply', reply: {id: 'option_5', title: "Nueva pregunta"}}, 
+      {type: 'reply', reply: {id:'option_6', title: "Emergencia"}}
+
+    ];
+
+    if (state.step === 'question') {
+      response = await openAIService(message);
+    }
+
+    delete this.assistantState[to]; 
+    await whatsappService.sendMessage(to, response); 
+    await whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
+
   }
 
 

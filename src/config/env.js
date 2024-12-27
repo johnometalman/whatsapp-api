@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import OpenAI from 'openai';
 
 dotenv.config();
 
@@ -8,4 +9,5 @@ export default {
   BUSINESS_PHONE: process.env.BUSINESS_PHONE,
   API_VERSION: process.env.API_VERSION,
   PORT: process.env.PORT || 3000,
+  CHATPGT_API_KEY: process.env.CHATPGT_API_KEY
 };
