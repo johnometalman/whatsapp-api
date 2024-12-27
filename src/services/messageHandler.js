@@ -132,14 +132,14 @@ class MessageHandler {
     appendToSheet(userData);
 
     return `Gracias por agendar tu cita. 
-    *Resumen de tu Cita:*
-    
-    *Nombre:* ${appointment.name}
-    *Nombre de la Mascota:* ${appointment.petName}
-    *Tipo de Mascota:* ${appointment.petType}
-    *Razón de Consulta:* ${appointment.reason}
-    
-    Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
+  *Resumen de tu Cita:*
+  
+  *Nombre:* ${appointment.name}
+  *Nombre de la Mascota:* ${appointment.petName}
+  *Tipo de Mascota:* ${appointment.petType}
+  *Razón de Consulta:* ${appointment.reason}
+  
+  Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
   }
 
   async handleAppointmentFlow(to, message) {
