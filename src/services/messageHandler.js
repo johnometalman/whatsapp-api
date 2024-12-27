@@ -1,4 +1,5 @@
 import whatsappService from './whatsappService.js';
+import appendToSheet from './googleSheetsService.js';
 
 class MessageHandler {
   constructor() {
@@ -120,25 +121,25 @@ class MessageHandler {
     delete this.appointmentState[to];
 
     const userData = [
-      to, 
-      appointment.name, 
+      to,
+      appointment.name,
       appointment.petName,
-      appointment.petType, 
+      appointment.petType,
       appointment.reason,
       new Date().toISOString()
     ]
 
-    console.log(userData);
+    appendToSheet(userData);
 
-  return `Gracias por agendar tu cida. 
-  *Reumen de tu Cita:*
-  
-  *Nombre:* ${appointment.name}
-  *Nombre de la Mascota:* ${appointment.petName}
-  *Tipo de Mascota:* ${appointment.petType}
-  *Razón de Consulta:* ${appointment.reason}
-  
-  Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
+    return `Gracias por agendar tu cita. 
+    *Resumen de tu Cita:*
+    
+    *Nombre:* ${appointment.name}
+    *Nombre de la Mascota:* ${appointment.petName}
+    *Tipo de Mascota:* ${appointment.petType}
+    *Razón de Consulta:* ${appointment.reason}
+    
+    Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`
   }
 
   async handleAppointmentFlow(to, message) {
@@ -167,7 +168,7 @@ class MessageHandler {
       case 'reason':
         state.reason = message;
         response = this.completeAppointment(to);
-        delete this.appointmentState[to]; 
+        delete this.appointmentState[to];
         break;
 
       default:
@@ -176,7 +177,7 @@ class MessageHandler {
     await whatsappService.sendMessage(to, response);
   }
 
-  
+
 }
 
 export default new MessageHandler();
