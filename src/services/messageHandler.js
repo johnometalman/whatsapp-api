@@ -93,7 +93,8 @@ class MessageHandler {
         break;
 
       case 'option_ubicacion':
-        response = 'Esta es nuestra Ubicación';
+        response = 'Te esperamos en nuestra sucursal';
+        await this.sendLocation(to);
         break;
 
 
@@ -251,9 +252,16 @@ Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu ci
     await whatsappService.sendContactMessage(to, contact);
   }
 
-  // async sendLocation(to){
+  async sendLocation(to){
+    const latitude = 6.2071694;
+    const longitude = -75.574607;
+    const name = 'Platzi Medellin';
+    const address = 'Cra. 43A #5A -113, El Poblado, Medellín, Antioquia';
 
-  // }
+    await whatsappService.sendLocationMessage (to, latitude, longitude, name, address);
+
+
+  }
 
 
 }
