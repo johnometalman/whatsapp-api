@@ -9,5 +9,6 @@ export default {
   BUSINESS_PHONE: process.env.BUSINESS_PHONE,
   API_VERSION: process.env.API_VERSION,
   PORT: process.env.PORT || 3000,
-  CHATPGT_API_KEY: process.env.CHATPGT_API_KEY
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  PROMPT: process.env.PROMPT
 };
