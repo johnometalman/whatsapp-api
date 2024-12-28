@@ -12,32 +12,32 @@ class MessageHandler {
     if (message?.type === 'text') {
       const incomingMessage = message.text.body.toLowerCase().trim();
 
-      if(this.isGreeting(incomingMessage)){
+      if (this.isGreeting(incomingMessage)) {
         await this.sendWelcomeMessage(message.from, message.id, senderInfo);
         await this.sendWelcomeMenu(message.from);
-      } 
-      
-      else if(incomingMessage === 'media') {
+      }
+
+      else if (incomingMessage === 'media') {
         await this.sendMedia(message.from);
-      } 
-      
+      }
+
       else if (this.appointmentState[message.from]) {
         await this.handleAppointmentFlow(message.from, incomingMessage);
-      } 
-      
+      }
+
       else if (this.assistantState[message.from]) {
         await this.handleAssistantFlow(message.from, incomingMessage);
-      }     
-      
-      
+      }
+
+
       else {
         await this.handleMenuOption(message.from, incomingMessage);
       }
       await whatsappService.markAsRead(message.id);
-    } 
-    
-      else if (message?.type === 'interactive') {
-      const option = message?.interactive?.button_reply?.title.toLowerCase().trim();
+    }
+
+    else if (message?.type === 'interactive') {
+      const option = message?.interactive?.button_reply?.id;
       await this.handleMenuOption(message.from, option);
       await whatsappService.markAsRead(message.id);
     }
@@ -64,15 +64,15 @@ class MessageHandler {
     const buttons = [
       {
         type: 'reply',
-        reply: { id: 'option_1', title: 'Agendar' }
+        reply: { id: 'option_agendar', title: 'Agendar' }
       },
       {
         type: 'reply',
-        reply: { id: 'option_2', title: 'Consultar' }
+        reply: { id: 'option_consultar', title: 'Consultar' }
       },
       {
         type: 'reply',
-        reply: { id: 'option_3', title: 'Ubicación' }
+        reply: { id: 'option_ubicacion', title: 'Ubicación' }
       }
     ];
 
@@ -82,19 +82,26 @@ class MessageHandler {
   async handleMenuOption(to, option) {
     let response;
     switch (option) {
-      case 'agendar':
+      case 'option_agendar':
         this.appointmentState[to] = { step: 'name' }; // Iniciar flujo de agendamiento
         response = 'Por favor ingresa tu nombre:';
         break;
 
-      case 'consultar':
+      case 'option_consultar':
         this.assistantState[to] = { step: 'question' }; // Iniciar flujo de asistente
         response = 'Por favor realiza tu consulta';
         break;
 
-      case 'ubicación':
+      case 'option_ubicacion':
         response = 'Esta es nuestra Ubicación';
         break;
+
+
+      case 'option_emergencia':
+        response = 'Si esto es una emegrencia te invitamos a enviarnos un mensaje a nuestra línea de atención'
+        await this.sendContact(to);
+        // acá no hay un break
+  
 
       default:
         response = 'Lo siento, no entendí tu selección, por favor selecciona una de las opciones';
@@ -178,9 +185,9 @@ Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu ci
 
     const menuMessage = "¿La respuesta fue de tu ayuda?"
     const buttons = [
-      {type: 'reply', reply: {id: 'option_4', title: "Si, gracias"} }, 
-      {type: 'reply', reply: {id: 'option_5', title: "Nueva pregunta"}}, 
-      {type: 'reply', reply: {id:'option_6', title: "Emergencia"}}
+      { type: 'reply', reply: { id: 'option_si', title: "Si, gracias" } },
+      { type: 'reply', reply: { id: 'option_new_question', title: "Nueva pregunta" } },
+      { type: 'reply', reply: { id: 'option_emergencia', title: "Emergencia" } }
 
     ];
 
@@ -188,13 +195,68 @@ Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu ci
       response = await openAIService(message);
     }
 
-    delete this.assistantState[to]; 
-    await whatsappService.sendMessage(to, response); 
+    delete this.assistantState[to];
+    await whatsappService.sendMessage(to, response);
     await whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
 
   }
 
+  async sendContact(to) {
+    const contact = {
+      addresses: [
+        {
+          street: "123 Calle de las Mascotas",
+          city: "Ciudad",
+          state: "Estado",
+          zip: "12345",
+          country: "País",
+          country_code: "PA",
+          type: "WORK"
+        }
+      ],
+      emails: [
+        {
+          email: "contacto@medpet.com",
+          type: "WORK"
+        }
+      ],
+      name: {
+        formatted_name: "MedPet Contacto",
+        first_name: "MedPet",
+        last_name: "Contacto",
+        middle_name: "",
+        suffix: "",
+        prefix: ""
+      },
+      org: {
+        company: "MedPet",
+        department: "Atención al Cliente",
+        title: "Representante"
+      },
+      phones: [
+        {
+          phone: "+1234567890",
+          wa_id: "1234567890",
+          type: "WORK"
+        }
+      ],
+      urls: [
+        {
+          url: "https://www.medpet.com",
+          type: "WORK"
+        }
+      ]
+    };
+
+    await whatsappService.sendContactMessage(to, contact);
+  }
+
+  // async sendLocation(to){
+
+  // }
+
 
 }
+
 
 export default new MessageHandler();
