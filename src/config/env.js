@@ -10,5 +10,7 @@ export default {
   API_VERSION: process.env.API_VERSION,
   PORT: process.env.PORT || 3000,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-  PROMPT: process.env.PROMPT
+  PROMPT: process.env.PROMPT,
+  BASE_URL: process.env.BASE_URL
+
 };

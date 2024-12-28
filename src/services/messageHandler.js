@@ -99,9 +99,10 @@ class MessageHandler {
 
 
       case 'option_emergencia':
-        response = 'Si esto es una emegrencia te invitamos a enviarnos un mensaje a nuestra línea de atención'
+        response = 'Si esto es una emergencia te invitamos a enviarnos un mensaje a nuestra línea de atención';
         await this.sendContact(to);
-        // acá no hay un break
+        break; 
+
   
 
       default:
