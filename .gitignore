@@ -1,3 +1,4 @@
 node_modules/
 src/credentials/credentials.json
 .env
+server.js

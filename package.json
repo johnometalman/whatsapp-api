@@ -1,25 +1,50 @@
 {
-  "name": "medpet",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "medpet",  // Name of the project.
+  "version": "1.0.0",  // Current version of the project.
+  "main": "index.js",  // Main entry point of the application (not used directly here, since 'src/app.js' is used instead).
+  
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "test": "echo \"Error: no test specified\" && exit 1",  
+    // 'test' script - Placeholder that shows an error if you try to run tests without defining them.
+
+    "start": "node src/app.js",  
+    // 'start' script - Runs the app using Node.js by executing 'src/app.js'.
+    
+    "dev": "nodemon src/app.js"  
+    // 'dev' script - Runs the app using 'nodemon', which restarts the server automatically when file changes are detected (useful for development).
   },
-  "type": "module",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "axios": "^1.7.9",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "googleapis": "^144.0.0",
-    "openai": "^4.77.0"
+
+  "type": "module",  
+  // Tells Node.js to use ES Modules (import/export) instead of CommonJS (require/module.exports).
+
+  "keywords": [],  // Optional keywords to describe the project (can help with discoverability).
+  "author": "",  // Author of the project.
+  "license": "ISC",  // License type (ISC is a permissive license).
+  "description": "",  // Short description of the project.
+
+  "dependencies": {  
+    // List of packages required for the project to run.
+    
+    "axios": "^1.7.9",  
+    // Axios - Makes HTTP requests (e.g., calling APIs).
+
+    "dotenv": "^16.4.7",  
+    // Dotenv - Loads environment variables from a '.env' file into 'process.env'.
+
+    "express": "^4.21.2",  
+    // Express - Framework for building web servers and handling HTTP requests.
+
+    "googleapis": "^144.0.0",  
+    // Google APIs - Allows interaction with Google services (e.g., Sheets, Drive).
+
+    "openai": "^4.77.0"  
+    // OpenAI - Allows interaction with OpenAI APIs (e.g., ChatGPT, DALL·E).
   },
-  "devDependencies": {
-    "nodemon": "^3.1.7"
+
+  "devDependencies": {  
+    // Development-only dependencies (not needed in production).
+    
+    "nodemon": "^3.1.7"  
+    // Nodemon - Restarts the server automatically when file changes are detected.
   }
 }
