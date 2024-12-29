@@ -99,15 +99,20 @@ class MessageHandler {
   completeAppointment(to) {
     const { name, petName, petType, reason } = this.appointmentState[to];
     delete this.appointmentState[to];
-    appendToSheet([to, name, petName, petType, reason, new Date().toISOString()]);
+
+    const data = [to, name, petName, petType, reason, new Date().toISOString()];
+    console.log('Data to append:', data);  // Log the data being sent to Google Sheets
+    appendToSheet(data);
+
     return `Gracias por agendar tu cita. 
-*Resumen de tu Cita:*
-*Nombre:* ${name}
-*Nombre de la Mascota:* ${petName}
-*Tipo de Mascota:* ${petType}
-*Razón de Consulta:* ${reason}
-Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`;
-  }
+    *Resumen de tu Cita:*
+    *Nombre:* ${name}
+    *Nombre de la Mascota:* ${petName}
+    *Tipo de Mascota:* ${petType}
+    *Razón de Consulta:* ${reason}
+    Nos pondremos en contacto contigo pronto para confirmar la fecha y hora de tu cita`;
+}
+
 
   // Maneja el flujo de agendamiento paso a paso
   async handleAppointmentFlow(to, message) {

@@ -12,17 +12,19 @@ async function addRowToSheet(auth, spreadsheetId, values) {
         const response = await sheets.spreadsheets.values.append({
             auth: auth,
             spreadsheetId: spreadsheetId,
-            range: 'reservas',  // Rango donde se agregará la fila
-            valueInputOption: 'RAW',  // Los datos se insertarán como están
-            insertDataOption: 'INSERT_ROWS',  // Inserta nuevas filas sin sobrescribir
+            range: 'reservas', // Ensure the sheet name is correct
+            valueInputOption: 'RAW',   
+            insertDataOption: 'INSERT_ROWS',  
             requestBody: {
-                values: [values],  // Datos a insertar
+                values: [values],
             }
         });
+
+        console.log('Google Sheets response:', response.data); // Log the response
         return response.data;
 
     } catch (error) {
-        console.error('Error adding row to sheet:', error);  // Manejo de errores
+        console.error('Error adding row to sheet:', error); // Log error
     }
 }
 
